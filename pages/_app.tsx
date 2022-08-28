@@ -1,11 +1,14 @@
+import "../styles/global.css";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import { MantineProvider } from "@mantine/core";
-import { myCache } from "../lib/emotionCache";
+import { emCache } from "../lib/emotionCache";
 
 export default function App(props: AppProps) {
   const { Component, pageProps } = props;
-
+  // get the cache instance in the context of _app rendering
+  // Note: if the cache instance is retrieved outside the _app rendering context the insertionPoint is propery identified
+  const cache = emCache();
   return (
     <>
       <Head>
@@ -17,7 +20,9 @@ export default function App(props: AppProps) {
       </Head>
 
       <MantineProvider
-        emotionCache={myCache}
+        emotionCache={cache}
+        withGlobalStyles={false}
+        withNormalizeCSS={false}
         theme={{
           /** Put your mantine theme override here */
           colorScheme: "light",

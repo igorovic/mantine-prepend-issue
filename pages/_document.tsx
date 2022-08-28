@@ -6,9 +6,10 @@ import Document, {
   NextScript,
 } from "next/document";
 import { ServerStyles, createStylesServer } from "@mantine/next";
-import { myCache } from "../lib/emotionCache";
+import { emCache } from "../lib/emotionCache";
 
-const stylesServer = createStylesServer(myCache);
+// get the cache instance
+const stylesServer = createStylesServer(emCache());
 export default class _Document extends Document {
   static async getInitialProps(ctx: DocumentContext) {
     const initialProps = await Document.getInitialProps(ctx);
@@ -20,7 +21,7 @@ export default class _Document extends Document {
         <ServerStyles
           html={initialProps.html}
           server={stylesServer}
-          key="styles"
+          key="mantine"
         />,
       ],
     };
@@ -28,7 +29,7 @@ export default class _Document extends Document {
   render() {
     return (
       <Html>
-        <Head />
+        <Head></Head>
         <body>
           <Main />
           <NextScript />

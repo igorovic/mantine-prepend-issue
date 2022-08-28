@@ -8,8 +8,63 @@ In `development` everything seemed fine. However in `production` mantine style w
 
 ![btn transparent example](https://raw.githubusercontent.com/igorovic/mantine-prepend-issue/main/public/btn1.gif)
 
-Eventually, after many trials I was able to make it work. Here is how.
+Eventually, after many trials I was able to make it work. _The issue seems related to the hydration process_.
+
+The tipping point of the solution was to call `createEmotionCache` inside the rendering context of `_app.tsx`.
+
+```tsx
+export default function App(props: AppProps) {
+  const { Component, pageProps } = props;
+  // get the cache instance in the context of _app rendering
+  // Note: if the cache instance is retrieved outside the _app rendering context the insertionPoint is propery identified
+  const cache = emCache();
+  return (
+    <>
+      <Head>
+```
+
+## Emtion cache creation function
+
+```ts
+// lib/emotionCache.ts
+import { createEmotionCache, EmotionCache } from "@mantine/core";
+import { last } from "remeda";
+//cache instance
+let cache: EmotionCache | undefined;
+
+const getInsertionPoint = () =>
+  typeof document !== "undefined" && process.env.NODE_ENV === "production"
+    ? last([
+        ...(document
+          .querySelector("head")
+          ?.querySelectorAll<HTMLElement>(`script`) ?? []),
+      ])
+    : undefined;
+
+const creatCache = () =>
+  createEmotionCache({
+    key: "mantine",
+    insertionPoint: getInsertionPoint(),
+  });
+
+export const emCache = () => {
+  console.log("= insertionPoint element = ", getInsertionPoint());
+  // we create the cache instance only once so it's consistent between SSR and client side.
+  if (!cache) {
+    cache = creatCache();
+  }
+
+  return cache;
+};
+```
+
+## Notes
+
+I did not spend much time testing this implementation and maybe I am missing something. Any help, feedback will be appreciated.
 
 ## References
 
 - [mantine SSR cache](https://mantine.dev/guides/ssr/)
+- [https://github.com/mantinedev/mantine/issues/2119](https://github.com/mantinedev/mantine/issues/2119)
+- [https://github.com/emotion-js/emotion/issues/2803](https://github.com/emotion-js/emotion/issues/2803)
+- [https://github.com/emotion-js/emotion/issues/2790](https://github.com/emotion-js/emotion/issues/2790)

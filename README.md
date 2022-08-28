@@ -1,17 +1,11 @@
-# How to reproduce
+# Place your emtion style in the desired spot
 
-```shell
-npm install
-npm run build
-npm start
-```
+`@emotion/cache@11.6.0` has deprecated the option `prepend` in favor of `insertionPoint`. [link](https://newreleases.io/project/github/emotion-js/emotion/release/@emotion%2Fcache@11.6.0)
 
-**OR**
+When I tested `insertionPoint` option in a Next.js app with the [mantine](https://mantine.dev/) UI library the behavior was not consistent between `development` and `production` mode.
 
-```shell
-pnpm install
-pnpm run build
-pnpm start
-```
+Eventually, after many trials I was able to make it work properly. Here is how.
 
-Then inspect the source code.
+## References
+
+- [mantine SSR cache](https://mantine.dev/guides/ssr/)
